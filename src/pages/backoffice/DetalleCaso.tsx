@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { CheckCircle2, ChevronLeft, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ShieldCheck, Users } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ export default function DetalleCaso() {
   const { casoId } = useParams<{ casoId: string }>();
   const navigate = useNavigate();
   const rolBackoffice = useAppStore((s) => s.rolBackoffice);
+  const setRolBackoffice = useAppStore((s) => s.setRolBackoffice);
   const caso = useAppStore((s) => s.casos.find((c) => c.id === casoId));
   const confirmarResolucion = useAppStore((s) => s.confirmarResolucion);
 
@@ -44,9 +45,14 @@ export default function DetalleCaso() {
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" size="sm" className="gap-1" onClick={() => navigate("/backoffice/casos")}>
-        <ChevronLeft className="h-4 w-4" /> Volver a la bandeja
-      </Button>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button variant="ghost" size="sm" className="gap-1" onClick={() => navigate("/backoffice/casos")}>
+          <ChevronLeft className="h-4 w-4" /> Volver a la bandeja
+        </Button>
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setRolBackoffice(null)}>
+          <Users className="h-3.5 w-3.5" /> Cambiar de rol
+        </Button>
+      </div>
 
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3" data-tour="backoffice-detalle-caso">
         <div>

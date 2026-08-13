@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -49,9 +50,16 @@ function colorConfianza(nivel: NivelConfianza) {
   return "bg-destructive text-destructive-foreground";
 }
 
+const ETIQUETAS_ROL: Record<string, string> = {
+  "registro-curricular": "Registro Curricular",
+  "coordinador-academico": "Coordinador académico",
+  "analista-diferenciados": "Analista de Ingresos Diferenciados",
+};
+
 export default function BandejaCasos() {
   const navigate = useNavigate();
   const rolBackoffice = useAppStore((s) => s.rolBackoffice);
+  const setRolBackoffice = useAppStore((s) => s.setRolBackoffice);
   const casos = useAppStore((s) => s.casos);
 
   const [filtroVia, setFiltroVia] = useState<string>("todas");
@@ -72,11 +80,17 @@ export default function BandejaCasos() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Bandeja de casos</h1>
-        <p className="text-muted-foreground mt-1">
-          {casos.length} casos en total. Ordenados por menor confianza y mayor antigüedad primero.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Bandeja de casos</h1>
+          <p className="text-muted-foreground mt-1">
+            {casos.length} casos en total. Ordenados por menor confianza y mayor antigüedad primero.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setRolBackoffice(null)}>
+          <Users className="h-3.5 w-3.5" />
+          Rol actual: {ETIQUETAS_ROL[rolBackoffice]} — Cambiar de rol
+        </Button>
       </div>
 
       <Card>

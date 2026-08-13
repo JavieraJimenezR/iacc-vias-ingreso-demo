@@ -88,6 +88,7 @@ export const useAppStore = create<AppState>()(
         set({
           tipoUsuarioActivo: null,
           usuarioActivoId: null,
+          rolBackoffice: null,
           perspectiva: "portada",
         }),
 

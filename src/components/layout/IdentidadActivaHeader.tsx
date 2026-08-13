@@ -35,7 +35,7 @@ export function IdentidadActivaHeader() {
     .toUpperCase();
 
   return (
-    <div className="hidden sm:flex items-center gap-2 pl-2 border-l" data-tour="identidad-activa">
+    <div className="flex items-center gap-2 sm:pl-2 sm:border-l" data-tour="identidad-activa">
       <Avatar className="h-7 w-7">
         <AvatarFallback className="text-xs bg-secondary text-primary font-medium">
           {iniciales}
