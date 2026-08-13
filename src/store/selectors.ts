@@ -30,3 +30,15 @@ export function selEstudianteActivo(perspectiva: AppState["perspectiva"]) {
   if (perspectiva === "estudiante") return estudiantesSeed.find((e) => e.id === "est-rodrigo");
   return undefined;
 }
+
+/**
+ * Caso del usuario activo en la demo (según usuarioActivoId, fijado por el
+ * selector de identidad mock). Devuelve undefined si nadie ha iniciado
+ * sesión mock o si el estudiante activo no tiene un caso asociado.
+ */
+export function selCasoActivoDelUsuario(state: AppState): Caso | undefined {
+  if (!state.usuarioActivoId) return undefined;
+  const estudiante = selEstudiantePorId(state.usuarioActivoId);
+  if (!estudiante?.casoActivoId) return undefined;
+  return state.casos.find((c) => c.id === estudiante.casoActivoId);
+}

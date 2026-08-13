@@ -48,7 +48,7 @@ export default function DetalleCaso() {
         <ChevronLeft className="h-4 w-4" /> Volver a la bandeja
       </Button>
 
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3" data-tour="backoffice-detalle-caso">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{caso.numeroCaso}</h1>
           <p className="text-muted-foreground mt-1">

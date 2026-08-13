@@ -115,7 +115,7 @@ export default function BandejaCasos() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="backoffice-bandeja">
         <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>

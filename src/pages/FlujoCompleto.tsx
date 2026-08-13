@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PasoFlujo, type DatoPasoFlujo } from "@/components/flujo/PasoFlujo";
 import { REGLA_APROBACION_HUMANA } from "@/lib/motor-ia/enrutamiento";
+import { TituloPagina } from "@/components/layout/TituloPagina";
 
 const PASOS_POSTULANTE: DatoPasoFlujo[] = [
   { titulo: "Elige su vía de ingreso", descripcion: "El postulante indica si viene por RFCP (título previo) o convalidación de asignaturas.", actor: "persona-iacc" },
@@ -29,12 +30,10 @@ export default function FlujoCompleto() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Flujo completo del sistema</h1>
-        <p className="text-muted-foreground mt-1">
-          Dos rutas en paralelo: postulante nuevo y estudiante ya matriculado. Navega paso a paso.
-        </p>
-      </div>
+      <TituloPagina
+        titulo="Flujo completo del sistema"
+        descripcion="Dos rutas en paralelo: postulante nuevo y estudiante ya matriculado. Navega paso a paso."
+      />
 
       <div className="flex items-center justify-between gap-3">
         <Button variant="outline" size="sm" onClick={() => setPasoActivo((p) => Math.max(0, p - 1))} disabled={pasoActivo === 0}>
@@ -46,7 +45,7 @@ export default function FlujoCompleto() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-tour="flujo-completo-rutas">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Ruta: Postulante</CardTitle>

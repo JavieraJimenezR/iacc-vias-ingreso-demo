@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineaTiempoSeguimiento } from "@/components/seguimiento/LineaTiempoSeguimiento";
 import { useAppStore } from "@/store/useAppStore";
-
-const CASO_ID = "caso-rodrigo";
+import { selCasoActivoDelUsuario } from "@/store/selectors";
+import { SinCasoActivo } from "@/components/layout/SinCasoActivo";
+import { TituloPagina } from "@/components/layout/TituloPagina";
 
 const ETIQUETAS_ESTADO: Record<string, string> = {
   "documentos-pendientes": "Documentos pendientes",
@@ -19,21 +20,21 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
 
 export default function SolicitudesAcademicas() {
   const navigate = useNavigate();
-  const caso = useAppStore((s) => s.casos.find((c) => c.id === CASO_ID));
+  const caso = useAppStore(selCasoActivoDelUsuario);
 
   if (!caso) {
-    return <p className="text-muted-foreground">No tienes solicitudes académicas activas.</p>;
+    return <SinCasoActivo mensaje="No encontramos solicitudes académicas activas para esta sesión de demo." />;
   }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Solicitudes académicas</h1>
-        <p className="text-muted-foreground mt-1">Historial de tus solicitudes de reconocimiento.</p>
-      </div>
+      <TituloPagina
+        titulo="Solicitudes académicas"
+        descripcion="Historial de tus solicitudes de reconocimiento."
+      />
 
       <Card
-        className="cursor-pointer hover:border-primary transition-colors"
+        className="cursor-pointer hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition-all"
         onClick={() => navigate("/estudiante")}
       >
         <CardHeader className="flex flex-row items-start justify-between gap-2">

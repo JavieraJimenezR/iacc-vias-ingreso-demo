@@ -3,29 +3,49 @@ import { AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MallaVisual } from "@/components/malla/MallaVisual";
+import { LineaTiempoSeguimiento } from "@/components/seguimiento/LineaTiempoSeguimiento";
 import { useAppStore } from "@/store/useAppStore";
-import { estudianteRodrigo } from "@/lib/mock-data";
-
-const CASO_ID = "caso-rodrigo";
+import { selCasoActivoDelUsuario, selEstudiantePorId } from "@/store/selectors";
+import { SinCasoActivo } from "@/components/layout/SinCasoActivo";
 
 export default function Portal() {
   const navigate = useNavigate();
-  const caso = useAppStore((s) => s.casos.find((c) => c.id === CASO_ID));
+  const caso = useAppStore(selCasoActivoDelUsuario);
+  const usuarioActivoId = useAppStore((s) => s.usuarioActivoId);
+  const estudiante = selEstudiantePorId(usuarioActivoId ?? undefined);
 
-  const bloqueado = caso?.estado === "bloqueado-documento-pendiente";
+  if (!caso || !estudiante) {
+    return <SinCasoActivo />;
+  }
+
+  const bloqueado = caso.estado === "bloqueado-documento-pendiente";
+  const iniciales = estudiante.nombreCompleto
+    .split(" ")
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Hola, {estudianteRodrigo.nombreCompleto.split(" ")[0]}</h1>
-        <p className="text-muted-foreground mt-1">
-          {estudianteRodrigo.carrera} · Ciclo {estudianteRodrigo.cicloActual}
-        </p>
+      <div className="flex items-center gap-4" data-tour="estudiante-encabezado">
+        <Avatar className="h-14 w-14 border-2 border-primary/30">
+          <AvatarFallback className="bg-secondary text-primary font-semibold text-lg">
+            {iniciales}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Hola, {estudiante.nombreCompleto.split(" ")[0]}</h1>
+          <p className="text-muted-foreground mt-1">
+            {estudiante.carrera} · Ciclo {estudiante.cicloActual}
+          </p>
+        </div>
       </div>
 
       {bloqueado && caso && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" data-tour="estudiante-alerta-bloqueo">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Inscripción bloqueada por documento pendiente</AlertTitle>
           <AlertDescription className="space-y-2">
@@ -47,33 +67,42 @@ export default function Portal() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-tour="estudiante-ficha">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Carrera</CardTitle>
           </CardHeader>
-          <CardContent className="font-medium">{estudianteRodrigo.carrera}</CardContent>
+          <CardContent className="font-medium">{estudiante.carrera}</CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Ciclo actual</CardTitle>
           </CardHeader>
-          <CardContent className="text-xl font-semibold text-foreground">{estudianteRodrigo.cicloActual}</CardContent>
+          <CardContent className="text-xl font-semibold text-foreground">{estudiante.cicloActual}</CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Avance curricular</CardTitle>
           </CardHeader>
-          <CardContent className="text-xl font-semibold text-primary">{estudianteRodrigo.avanceCurricularPorcentaje}%</CardContent>
+          <CardContent className="text-xl font-semibold text-primary">{estudiante.avanceCurricularPorcentaje}%</CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card data-tour="estudiante-malla">
         <CardHeader>
           <CardTitle className="text-base">Tu malla académica</CardTitle>
         </CardHeader>
         <CardContent>
-          <MallaVisual malla={estudianteRodrigo.malla} />
+          <MallaVisual malla={estudiante.malla} />
+        </CardContent>
+      </Card>
+
+      <Card data-tour="estudiante-linea-tiempo">
+        <CardHeader>
+          <CardTitle className="text-base">Estado de tu caso</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LineaTiempoSeguimiento estadoActual={caso.estado} creadoEn={caso.creadoEn} />
         </CardContent>
       </Card>
 

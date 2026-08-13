@@ -35,7 +35,7 @@ export function SelectorRolBackoffice() {
           El backoffice muestra distintos paneles según el rol de quien revisa el caso.
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-tour="backoffice-selector-rol">
         {ROLES.map((r) => {
           const Icono = r.icono;
           return (

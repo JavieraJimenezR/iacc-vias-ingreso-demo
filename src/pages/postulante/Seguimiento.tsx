@@ -3,28 +3,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineaTiempoSeguimiento } from "@/components/seguimiento/LineaTiempoSeguimiento";
 import { useAppStore } from "@/store/useAppStore";
-
-const CASO_ID = "caso-camila";
+import { selCasoActivoDelUsuario } from "@/store/selectors";
+import { SinCasoActivo } from "@/components/layout/SinCasoActivo";
+import { TituloPagina } from "@/components/layout/TituloPagina";
+import { PasosPostulante } from "@/components/postulante/PasosPostulante";
 
 export default function Seguimiento() {
   const navigate = useNavigate();
-  const caso = useAppStore((s) => s.casos.find((c) => c.id === CASO_ID));
+  const caso = useAppStore(selCasoActivoDelUsuario);
   const avanzarProcesoCaso = useAppStore((s) => s.avanzarProcesoCaso);
 
   if (!caso) {
-    return <p className="text-muted-foreground">No hay un caso activo de postulante en esta demo.</p>;
+    return <SinCasoActivo />;
   }
 
   const resuelto = caso.estado === "resuelto-reconocido" || caso.estado === "resuelto-rechazado";
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Seguimiento de tu solicitud</h1>
-        <p className="text-muted-foreground mt-1">Caso {caso.numeroCaso} — {caso.carreraDestino}</p>
-      </div>
+      <PasosPostulante estadoCaso={caso.estado} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <TituloPagina
+        rotulo="Paso 3 de 4"
+        titulo="Seguimiento de tu solicitud"
+        descripcion={`Caso ${caso.numeroCaso} — ${caso.carreraDestino}`}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" data-tour="postulante-seguimiento-tiempos">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-muted-foreground">Tiempo estimado de respuesta</CardTitle>
@@ -46,7 +51,12 @@ export default function Seguimiento() {
       </Card>
 
       <div className="flex flex-col sm:flex-row justify-between gap-2">
-        <Button variant="outline" onClick={() => avanzarProcesoCaso(CASO_ID)} disabled={resuelto}>
+        <Button
+          variant="outline"
+          onClick={() => avanzarProcesoCaso(caso.id)}
+          disabled={resuelto}
+          data-tour="postulante-avanzar-proceso"
+        >
           Avanzar el proceso (demo)
         </Button>
         {resuelto && <Button onClick={() => navigate("/postulante/resultado")}>Ver resultado</Button>}

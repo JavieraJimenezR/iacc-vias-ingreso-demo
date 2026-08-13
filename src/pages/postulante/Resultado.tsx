@@ -5,33 +5,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MallaVisual } from "@/components/malla/MallaVisual";
 import { useAppStore } from "@/store/useAppStore";
-import { estudianteCamila } from "@/lib/mock-data";
-
-const CASO_ID = "caso-camila";
+import { selCasoActivoDelUsuario, selEstudiantePorId } from "@/store/selectors";
+import { SinCasoActivo } from "@/components/layout/SinCasoActivo";
+import { TituloPagina } from "@/components/layout/TituloPagina";
+import { PasosPostulante } from "@/components/postulante/PasosPostulante";
 
 export default function Resultado() {
-  const caso = useAppStore((s) => s.casos.find((c) => c.id === CASO_ID));
+  const caso = useAppStore(selCasoActivoDelUsuario);
+  const usuarioActivoId = useAppStore((s) => s.usuarioActivoId);
+  const estudiante = selEstudiantePorId(usuarioActivoId ?? undefined);
 
-  if (!caso) {
-    return <p className="text-muted-foreground">No hay un caso activo de postulante en esta demo.</p>;
+  if (!caso || !estudiante) {
+    return <SinCasoActivo />;
   }
 
   const reconocidas = caso.equivalencias.filter((eq) => eq.decisionRevisor === "aprobado" || (eq.propuestaIA === "reconocer" && !eq.decisionRevisor));
   const noReconocidas = caso.equivalencias.filter((eq) => !reconocidas.includes(eq));
 
-  const totalAsignaturasMalla = estudianteCamila.malla.length;
-  const reconocidasCount = estudianteCamila.malla.filter((a) => a.reconocida).length;
+  const totalAsignaturasMalla = estudiante.malla.length;
+  const reconocidasCount = estudiante.malla.filter((a) => a.reconocida).length;
   const semestresAcortados = Math.round(reconocidasCount / 5);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 print:max-w-full">
+      <div className="print:hidden">
+        <PasosPostulante estadoCaso={caso.estado} />
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Resultado de tu solicitud</h1>
-          <p className="text-muted-foreground mt-1">
-            Caso {caso.numeroCaso} — {caso.carreraOrigen} → {caso.carreraDestino}
-          </p>
-        </div>
+        <TituloPagina
+          rotulo="Paso 4 de 4"
+          titulo="Resultado de tu solicitud"
+          descripcion={`Caso ${caso.numeroCaso} — ${caso.carreraOrigen} → ${caso.carreraDestino}`}
+        />
         <Button variant="outline" onClick={() => window.print()} className="print:hidden">
           Descargar carta de resolución (PDF)
         </Button>
@@ -139,7 +145,7 @@ export default function Resultado() {
           <CardTitle className="text-base">Tu malla ajustada</CardTitle>
         </CardHeader>
         <CardContent>
-          <MallaVisual malla={estudianteCamila.malla} />
+          <MallaVisual malla={estudiante.malla} />
         </CardContent>
       </Card>
 

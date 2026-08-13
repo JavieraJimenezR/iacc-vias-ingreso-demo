@@ -1,51 +1,57 @@
 import { useNavigate } from "react-router-dom";
 import { GraduationCap, UserRound, Building2, Waypoints } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore, type Perspectiva } from "@/store/useAppStore";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAppStore, type TipoUsuarioActivo } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 
-interface TarjetaPortada {
-  perspectiva: Perspectiva;
+interface TarjetaIdentidad {
+  tipoUsuario: Exclude<TipoUsuarioActivo, null>;
+  usuarioId: string | null;
   ruta: string;
   titulo: string;
+  nombre: string;
+  iniciales: string;
   descripcion: string;
   icono: React.ComponentType<{ className?: string }>;
 }
 
-const TARJETAS: TarjetaPortada[] = [
+const TARJETAS: TarjetaIdentidad[] = [
   {
-    perspectiva: "postulante",
-    ruta: "/postulante/via",
+    tipoUsuario: "postulante",
+    usuarioId: "est-camila",
+    ruta: "/postulante",
     titulo: "Soy postulante",
+    nombre: "Camila Fuentes",
+    iniciales: "CF",
     descripcion: "Quiero convalidar o reconocer estudios previos antes de matricularme.",
     icono: UserRound,
   },
   {
-    perspectiva: "estudiante",
+    tipoUsuario: "estudiante",
+    usuarioId: "est-rodrigo",
     ruta: "/estudiante",
     titulo: "Soy estudiante IACC",
+    nombre: "Rodrigo Salas",
+    iniciales: "RS",
     descripcion: "Ya estoy matriculado y quiero revisar mis solicitudes académicas.",
     icono: GraduationCap,
   },
   {
-    perspectiva: "backoffice",
+    tipoUsuario: "staff",
+    usuarioId: null,
     ruta: "/backoffice",
     titulo: "Soy del equipo IACC",
+    nombre: "Equipo IACC",
+    iniciales: "IA",
     descripcion: "Reviso, verifico y resuelvo casos de vías de ingreso.",
     icono: Building2,
-  },
-  {
-    perspectiva: "flujo-completo",
-    ruta: "/flujo-completo",
-    titulo: "Ver el flujo completo",
-    descripcion: "Recorre paso a paso cómo opera el sistema de punta a punta.",
-    icono: Waypoints,
   },
 ];
 
 export default function Portada() {
   const navigate = useNavigate();
-  const setPerspectiva = useAppStore((s) => s.setPerspectiva);
+  const setUsuarioActivo = useAppStore((s) => s.setUsuarioActivo);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -55,36 +61,62 @@ export default function Portada() {
         </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Una plataforma con inteligencia artificial que propone reconocimientos de aprendizajes
-          previos, siempre con aprobación humana final. Explora la demo desde distintas
-          perspectivas.
+          previos, siempre con aprobación humana final. Elige quién eres para explorar la demo
+          desde esa perspectiva.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-tour="portada-tarjetas">
         {TARJETAS.map((t) => {
           const Icono = t.icono;
           return (
             <Card
-              key={t.perspectiva}
+              key={t.tipoUsuario}
               className={cn(
-                "cursor-pointer transition-shadow hover:shadow-lg border-2 hover:border-primary"
+                "cursor-pointer transition-all hover:shadow-lg border-2 hover:border-primary hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               )}
+              tabIndex={0}
+              role="button"
               onClick={() => {
-                setPerspectiva(t.perspectiva);
+                setUsuarioActivo(t.tipoUsuario, t.usuarioId);
                 navigate(t.ruta);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setUsuarioActivo(t.tipoUsuario, t.usuarioId);
+                  navigate(t.ruta);
+                }
               }}
             >
               <CardHeader>
-                <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center mb-2">
-                  <Icono className="h-6 w-6 text-primary" />
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-12 w-12 border-2 border-primary/30">
+                    <AvatarFallback className="bg-secondary text-primary font-semibold">
+                      {t.iniciales}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Icono className="h-6 w-6 text-primary shrink-0" />
                 </div>
                 <CardTitle>{t.titulo}</CardTitle>
+                <p className="text-sm font-medium text-primary">{t.nombre}</p>
                 <CardDescription>{t.descripcion}</CardDescription>
               </CardHeader>
               <CardContent />
             </Card>
           );
         })}
+      </div>
+
+      <div className="text-center mt-6">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+          onClick={() => navigate("/flujo-completo")}
+          data-tour="portada-flujo-completo"
+        >
+          <Waypoints className="h-3.5 w-3.5" />
+          Ver el flujo completo del sistema
+        </button>
       </div>
     </div>
   );

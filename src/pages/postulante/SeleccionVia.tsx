@@ -4,22 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { REGLA_APROBACION_HUMANA } from "@/lib/motor-ia/enrutamiento";
+import { TituloPagina } from "@/components/layout/TituloPagina";
+import { PasosPostulante } from "@/components/postulante/PasosPostulante";
+import { useAppStore } from "@/store/useAppStore";
+import { selCasoActivoDelUsuario } from "@/store/selectors";
 
 export default function SeleccionVia() {
   const navigate = useNavigate();
+  const caso = useAppStore(selCasoActivoDelUsuario);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">¿Qué quieres hacer?</h1>
-        <p className="text-muted-foreground mt-1">
-          Elige la opción que mejor describe tu situación. Camila Fuentes, nuestra postulante de
-          ejemplo, viene de un Técnico en Administración y quiere convalidar asignaturas.
-        </p>
-      </div>
+      <PasosPostulante estadoCaso={caso?.estado} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="hover:border-primary hover:shadow-md transition-shadow">
+      <TituloPagina
+        rotulo="Paso 1 de 4"
+        titulo="¿Qué quieres hacer?"
+        descripcion="Elige la opción que mejor describe tu situación. Camila Fuentes, nuestra postulante de ejemplo, viene de un Técnico en Administración y quiere convalidar asignaturas."
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" data-tour="postulante-opciones-via">
+        <Card className="hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition-all">
           <CardHeader>
             <FileCheck2 className="h-8 w-8 text-primary mb-2" />
             <CardTitle className="text-lg">Convalidar asignaturas de una carrera que cursé</CardTitle>
@@ -35,7 +40,7 @@ export default function SeleccionVia() {
           </CardContent>
         </Card>
 
-        <Card className="hover:border-primary hover:shadow-md transition-shadow">
+        <Card className="hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition-all">
           <CardHeader>
             <GraduationCap className="h-8 w-8 text-primary mb-2" />
             <CardTitle className="text-lg">Reconocimiento por carrera previa terminada</CardTitle>

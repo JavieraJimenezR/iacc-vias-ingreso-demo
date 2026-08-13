@@ -12,12 +12,18 @@ import { casosSeed } from "@/lib/mock-data";
 
 export type Perspectiva = "portada" | "postulante" | "estudiante" | "backoffice" | "flujo-completo";
 
+export type TipoUsuarioActivo = "postulante" | "estudiante" | "staff" | null;
+
 interface AppState {
   perspectiva: Perspectiva;
   rolBackoffice: RolBackoffice | null;
   casos: Caso[];
+  tipoUsuarioActivo: TipoUsuarioActivo;
+  usuarioActivoId: string | null;
   setPerspectiva: (p: Perspectiva) => void;
   setRolBackoffice: (rol: RolBackoffice | null) => void;
+  setUsuarioActivo: (tipo: TipoUsuarioActivo, usuarioId: string | null) => void;
+  cerrarSesionMock: () => void;
   avanzarProcesoCaso: (casoId: string) => void;
   actualizarDocumento: (casoId: string, documentoId: string, patch: Partial<Documento>) => void;
   agregarDocumento: (casoId: string, doc: Documento) => void;
@@ -58,9 +64,32 @@ export const useAppStore = create<AppState>()(
       perspectiva: "portada",
       rolBackoffice: null,
       casos: structuredClone(casosSeed),
+      tipoUsuarioActivo: null,
+      usuarioActivoId: null,
 
       setPerspectiva: (p) => set({ perspectiva: p }),
       setRolBackoffice: (rol) => set({ rolBackoffice: rol }),
+
+      setUsuarioActivo: (tipo, usuarioId) =>
+        set({
+          tipoUsuarioActivo: tipo,
+          usuarioActivoId: usuarioId,
+          perspectiva:
+            tipo === "postulante"
+              ? "postulante"
+              : tipo === "estudiante"
+              ? "estudiante"
+              : tipo === "staff"
+              ? "backoffice"
+              : "portada",
+        }),
+
+      cerrarSesionMock: () =>
+        set({
+          tipoUsuarioActivo: null,
+          usuarioActivoId: null,
+          perspectiva: "portada",
+        }),
 
       avanzarProcesoCaso: (casoId) =>
         set((state) => ({
@@ -169,11 +198,21 @@ export const useAppStore = create<AppState>()(
           casos: structuredClone(casosSeed),
           perspectiva: "portada",
           rolBackoffice: null,
+          tipoUsuarioActivo: null,
+          usuarioActivoId: null,
         }),
     }),
     {
       name: "iacc-vias-ingreso-demo",
-      version: 1,
+      version: 2,
+      migrate: (persistedState, version) => {
+        const state = (persistedState ?? {}) as Partial<AppState>;
+        if (version < 2) {
+          state.tipoUsuarioActivo = state.tipoUsuarioActivo ?? null;
+          state.usuarioActivoId = state.usuarioActivoId ?? null;
+        }
+        return state as AppState;
+      },
     }
   )
 );

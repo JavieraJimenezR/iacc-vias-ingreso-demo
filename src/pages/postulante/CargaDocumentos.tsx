@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TarjetaDocumento } from "@/components/documentos/TarjetaDocumento";
 import { useAppStore } from "@/store/useAppStore";
+import { selCasoActivoDelUsuario } from "@/store/selectors";
 import { useSimulacionIA } from "@/hooks/use-simulacion-ia";
 import { ejecutarPipelineIA } from "@/lib/motor-ia/pipeline";
 import type { Documento } from "@/types";
-
-const CASO_ID = "caso-camila";
+import { SinCasoActivo } from "@/components/layout/SinCasoActivo";
+import { TituloPagina } from "@/components/layout/TituloPagina";
+import { PasosPostulante } from "@/components/postulante/PasosPostulante";
 
 export default function CargaDocumentos() {
   const navigate = useNavigate();
-  const caso = useAppStore((s) => s.casos.find((c) => c.id === CASO_ID));
+  const caso = useAppStore(selCasoActivoDelUsuario);
   const actualizarDocumento = useAppStore((s) => s.actualizarDocumento);
   const agregarEventoTrazabilidad = useAppStore((s) => s.agregarEventoTrazabilidad);
   const [analizandoId, setAnalizandoId] = useState<string | null>(null);
@@ -26,14 +28,15 @@ export default function CargaDocumentos() {
   );
 
   if (!caso) {
-    return <p className="text-muted-foreground">No hay un caso activo de postulante en esta demo.</p>;
+    return <SinCasoActivo />;
   }
 
   const casoActivo = caso;
+  const casoId = casoActivo.id;
 
   async function simularCarga(doc: Documento) {
     setAnalizandoId(doc.id);
-    actualizarDocumento(CASO_ID, doc.id, { estado: "analizando" });
+    actualizarDocumento(casoId, doc.id, { estado: "analizando" });
     try {
       const res = await pipeline.ejecutar({
         nombreArchivo: doc.nombreArchivo,
@@ -42,11 +45,11 @@ export default function CargaDocumentos() {
         carreraDestino: casoActivo.carreraDestino,
       });
       const rechazado = res.resultadoVerificacion.anomalias.length > 0 && res.resultadoVerificacion.esCapturaPantalla;
-      actualizarDocumento(CASO_ID, doc.id, {
+      actualizarDocumento(casoId, doc.id, {
         estado: rechazado ? "rechazado-requiere-reemplazo" : "verificado",
         resultadoVerificacion: res.resultadoVerificacion,
       });
-      agregarEventoTrazabilidad(CASO_ID, {
+      agregarEventoTrazabilidad(casoId, {
         actor: "plataforma-ia",
         descripcion: `Analizó documento "${doc.nombreArchivo}"${res.resultadoVerificacion.anomalias.length ? " y detectó anomalías" : ""}`,
         fecha: new Date().toISOString(),
@@ -60,13 +63,13 @@ export default function CargaDocumentos() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Carga de documentos</h1>
-        <p className="text-muted-foreground mt-1">
-          Simula la carga de los documentos de Camila Fuentes. Cada documento pasa por el motor de
-          verificación de la plataforma: legibilidad, firma, timbre y códigos de validación.
-        </p>
-      </div>
+      <PasosPostulante estadoCaso={caso.estado} />
+
+      <TituloPagina
+        rotulo="Paso 2 de 4"
+        titulo="Carga de documentos"
+        descripcion="Simula la carga de los documentos de Camila Fuentes. Cada documento pasa por el motor de verificación de la plataforma: legibilidad, firma, timbre y códigos de validación."
+      />
 
       {documentosPendientes.length > 0 && (
         <Card>
@@ -101,7 +104,7 @@ export default function CargaDocumentos() {
               documento={doc}
               analizando={analizandoId === doc.id}
               onReemplazar={() => {
-                actualizarDocumento(CASO_ID, doc.id, { estado: "cargado", resultadoVerificacion: undefined });
+                actualizarDocumento(casoId, doc.id, { estado: "cargado", resultadoVerificacion: undefined });
               }}
             />
           ))}
