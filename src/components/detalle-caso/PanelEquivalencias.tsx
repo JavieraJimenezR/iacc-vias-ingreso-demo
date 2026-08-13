@@ -3,7 +3,6 @@ import { Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EvidenciaLadoALado } from "./EvidenciaLadoALado";
 import { AccionesRevisor } from "./AccionesRevisor";
 import type { AsignaturaEquivalencia, Caso } from "@/types";
@@ -34,61 +33,54 @@ export function PanelEquivalencias({ caso, permitirAcciones }: PanelEquivalencia
       <CardHeader>
         <CardTitle className="text-base">Equivalencias propuestas</CardTitle>
       </CardHeader>
-      <CardContent className="overflow-x-auto space-y-2">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Asignatura externa</TableHead>
-              <TableHead>Asignatura IACC</TableHead>
-              <TableHead>% coincidencia</TableHead>
-              <TableHead>Confianza</TableHead>
-              <TableHead>Propuesta IA</TableHead>
-              <TableHead>Evidencia</TableHead>
-              {permitirAcciones && <TableHead>Decisión</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {caso.equivalencias.map((eq) => (
-              <TableRow key={eq.id}>
-                <TableCell className="text-sm">{eq.asignaturaExternaNombre}</TableCell>
-                <TableCell className="text-sm">
-                  {eq.asignaturaIaccModificadaCodigo ?? eq.asignaturaIaccCodigo} — {eq.asignaturaIaccNombre}
-                </TableCell>
-                <TableCell>{eq.porcentajeCoincidencia}%</TableCell>
-                <TableCell>
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", colorConfianza(eq.nivelConfianza))}>
-                    {eq.nivelConfianza}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={eq.propuestaIA === "reconocer" ? "outline" : "secondary"}>
-                    {ETIQUETAS_PROPUESTA[eq.propuestaIA]}
-                  </Badge>
-                  {eq.decisionRevisor && (
-                    <div className="text-xs text-muted-foreground mt-1">Decisión: {eq.decisionRevisor}</div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Button size="sm" variant="ghost" onClick={() => setEquivalenciaEvidencia(eq)}>
-                    <Eye className="h-3.5 w-3.5 mr-1" /> Ver evidencia
-                  </Button>
-                </TableCell>
-                {permitirAcciones && (
-                  <TableCell>
-                    <AccionesRevisor casoId={caso.id} equivalencia={eq} />
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-            {caso.equivalencias.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={permitirAcciones ? 7 : 6} className="text-center text-muted-foreground py-6">
-                  Este caso aún no tiene equivalencias calculadas.
-                </TableCell>
-              </TableRow>
+      <CardContent className="space-y-4">
+        {caso.equivalencias.map((eq) => (
+          <div key={eq.id} className="rounded-md border p-3 space-y-2.5">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="text-sm">
+                <p className="font-medium text-foreground">{eq.asignaturaExternaNombre}</p>
+                <p className="text-muted-foreground">
+                  → {eq.asignaturaIaccModificadaCodigo ?? eq.asignaturaIaccCodigo} — {eq.asignaturaIaccNombre}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-sm font-semibold">{eq.porcentajeCoincidencia}%</span>
+                <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", colorConfianza(eq.nivelConfianza))}>
+                  {eq.nivelConfianza}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant={eq.propuestaIA === "reconocer" ? "outline" : "secondary"}>
+                Propuesta IA: {ETIQUETAS_PROPUESTA[eq.propuestaIA]}
+              </Badge>
+              {eq.decisionRevisor && (
+                <span className="text-xs text-muted-foreground">Decisión: {eq.decisionRevisor}</span>
+              )}
+              <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setEquivalenciaEvidencia(eq)}>
+                <Eye className="h-3.5 w-3.5 mr-1" /> Ver evidencia
+              </Button>
+            </div>
+
+            {eq.propuestaIA !== "reconocer" && eq.motivoNoReconocimiento && (
+              <p className="text-xs text-advertencia-foreground bg-advertencia/15 border border-advertencia/40 rounded-md px-2.5 py-2">
+                {eq.motivoNoReconocimiento}
+              </p>
             )}
-          </TableBody>
-        </Table>
+
+            {permitirAcciones && (
+              <div className="pt-1 border-t">
+                <AccionesRevisor casoId={caso.id} equivalencia={eq} />
+              </div>
+            )}
+          </div>
+        ))}
+        {caso.equivalencias.length === 0 && (
+          <p className="text-center text-muted-foreground py-6">
+            Este caso aún no tiene equivalencias calculadas.
+          </p>
+        )}
       </CardContent>
 
       <EvidenciaLadoALado equivalencia={equivalenciaEvidencia} onOpenChange={(open) => !open && setEquivalenciaEvidencia(null)} />

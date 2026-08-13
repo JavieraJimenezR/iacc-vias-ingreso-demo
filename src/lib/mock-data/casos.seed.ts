@@ -505,11 +505,44 @@ const casosRelleno: Caso[] = [
     antiguedadDias: 33,
     responsableActual: "J. Pérez",
     responsableRol: "coordinador-academico",
-    documentos: [doc("d-011-1", "programa-asignatura", "Programa_Costos_011.pdf")],
-    equivalencias: [
-      equivalencia({ id: "eq-011-1", asignaturaExternaNombre: "Costos Básicos", asignaturaIaccCodigo: "ADM-2301", asignaturaIaccNombre: "Costos y Presupuestos", porcentajeCoincidencia: 62, nivelConfianza: "baja", propuestaIA: "revisar", motivoNoReconocimiento: "Contenido insuficiente en presupuesto operacional" }),
+    documentos: [
+      doc("d-011-1", "programa-asignatura", "Programa_Costos_011.pdf", {
+        resultadoVerificacion: {
+          legible: true,
+          tieneFirma: true,
+          tieneTimbre: true,
+          tieneCodigoValidable: false,
+          esCapturaPantalla: false,
+          anomalias: [],
+          datosExtraidos: { asignatura: "Costos Básicos", horas: 40, semestre: "3" },
+        },
+      }),
     ],
-    trazabilidad: [evento("tz-011-1", "plataforma-ia", "Coincidencia bajo el umbral: deriva a revisión académica", "2026-07-10T09:10:00-04:00")],
+    equivalencias: [
+      equivalencia({
+        id: "eq-011-1",
+        asignaturaExternaNombre: "Costos Básicos",
+        asignaturaExternaHoras: 40,
+        asignaturaIaccCodigo: "ADM-2301",
+        asignaturaIaccNombre: "Costos y Presupuestos",
+        asignaturaIaccSemestre: "4",
+        asignaturaIaccCreditos: 6,
+        porcentajeCoincidencia: 62,
+        nivelConfianza: "baja",
+        propuestaIA: "revisar",
+        motivoNoReconocimiento:
+          "El programa externo cubre solo costos fijos y variables de forma introductoria (40 horas). No aborda punto de equilibrio ni presupuesto operacional, contenidos centrales de la asignatura IACC.",
+        fragmentoExterno: "costos fijos y variables (nivel introductorio)",
+        fragmentoExternoFuente: "Programa_Costos_011.pdf, p. 1",
+        fragmentoIacc: "costos fijos y variables; punto de equilibrio; presupuesto operacional; análisis de costos",
+        fragmentoIaccFuente: "Malla IACC — ADM-2301, p. 1",
+      }),
+    ],
+    anomaliaDocumental: false,
+    trazabilidad: [
+      evento("tz-011-1", "plataforma-ia", "Extrajo el programa académico y comparó su contenido contra ADM-2301 (Costos y Presupuestos)", "2026-07-10T09:08:00-04:00"),
+      evento("tz-011-2", "plataforma-ia", "Calculó 62% de coincidencia de contenidos: bajo el umbral del 80%, deriva a revisión académica", "2026-07-10T09:10:00-04:00"),
+    ],
   },
   {
     id: "caso-012",

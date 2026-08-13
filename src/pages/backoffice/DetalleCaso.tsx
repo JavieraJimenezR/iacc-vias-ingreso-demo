@@ -79,7 +79,7 @@ export default function DetalleCaso() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={verDocumentos && verEquivalencias ? "grid grid-cols-1 xl:grid-cols-2 gap-6 items-start" : "space-y-6"}>
         {verDocumentos && (
           <PanelDocumentos caso={caso} permitirAcciones={rolBackoffice === "registro-curricular"} />
         )}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { History } from "lucide-react";
+import { History, AlertTriangle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,18 @@ export function EvidenciaLadoALado({ equivalencia, onOpenChange }: EvidenciaLado
                 {equivalencia.asignaturaExternaNombre} vs. {equivalencia.asignaturaIaccNombre} — {equivalencia.porcentajeCoincidencia}% de coincidencia
               </DialogDescription>
             </DialogHeader>
+
+            {equivalencia.propuestaIA !== "reconocer" && equivalencia.motivoNoReconocimiento && (
+              <div className="flex items-start gap-2 rounded-md bg-advertencia/15 border border-advertencia/40 px-3 py-2 text-sm">
+                <AlertTriangle className="h-4 w-4 text-advertencia shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-foreground">
+                    Por qué la plataforma derivó esta asignatura a revisión
+                  </p>
+                  <p className="text-muted-foreground">{equivalencia.motivoNoReconocimiento}</p>
+                </div>
+              </div>
+            )}
 
             {equivalencia.casoPrevioReferenciaId && (
               <div className="flex items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm">
